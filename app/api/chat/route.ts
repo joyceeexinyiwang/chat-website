@@ -2,16 +2,18 @@ import OpenAI from 'openai'
 import { NextResponse } from 'next/server'
 import type { ChatResponse } from '@/types/chat'
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY environment variable')
+const getOpenAIClient = () => {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OPENAI_API_KEY environment variable')
+  }
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
 }
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
 async function handleOpenAI(message: string): Promise<ChatResponse> {
   try {
+    const openai = getOpenAIClient()
     const completion = await openai.chat.completions.create({
       messages: [{ role: 'user', content: message }],
       model: 'gpt-3.5-turbo',
